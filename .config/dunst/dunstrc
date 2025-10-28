@@ -1,0 +1,22 @@
+[global]
+frame_color = "#282828"
+separator_color= frame
+highlight = "#282828"
+origin = top-right
+offset = (15,15)
+corner_radius = 10
+frame_width = 2
+idle_threshold = 2s
+
+[urgency_low]
+background = "#282828"
+foreground = "#ebdbb2"
+
+[urgency_normal]
+background = "#282828"
+foreground = "#ebdbb2"
+
+[urgency_critical]
+background = "#282828"
+foreground = "#ebdbb2"
+frame_color = "#d65d0e "

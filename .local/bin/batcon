@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# huawei-charge-mode.sh
+# Select Huawei battery charge mode via bemenu/dmenu with desktop notifications
+# Travel → Office → Home (custom order)
+# this one i have to admit was made with the "help" of AI not all of it tho
+
+set -euo pipefail
+
+SYSFILE="/sys/devices/platform/huawei-wmi/charge_control_thresholds"
+
+# Modes (unordered definitions)
+declare -A MODES=(
+  ["Home"]="40 70"
+  ["Office"]="70 90"
+  ["Travel"]="95 100"
+)
+
+# Explicit menu order
+MENU_ORDER=("Travel" "Office" "Home")
+
+# --- UI helpers ---
+menu() {
+  if command -v bemenu >/dev/null 2>&1; then
+    printf "%s\n" "${MENU_ORDER[@]}" | bemenu -p "Select charge mode:" -l 3 -c -M 580
+  elif command -v dmenu >/dev/null 2>&1; then
+    printf "%s\n" "${MENU_ORDER[@]}" | dmenu -p "Select charge mode:"
+  else
+    echo "bemenu/dmenu not found." >&2
+    exit 1
+  fi
+}
+
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Huawei Charge Mode" "$1${2:+\n$2}"
+  else
+    echo -e "$1${2:+\n$2}" >&2
+  fi
+}
+
+# --- Write logic ---
+write_thresholds() {
+  local pair="$1"
+
+  if [[ -w "$SYSFILE" ]]; then
+    echo "$pair" > "$SYSFILE"
+    return 0
+  fi
+
+  if command -v sudo >/dev/null 2>&1; then
+    if echo "$pair" | sudo -n tee "$SYSFILE" >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+# --- Main ---
+[[ -e "$SYSFILE" ]] || { notify "Device not found" "$SYSFILE missing (huawei-wmi driver?)"; exit 1; }
+
+mode="$(menu || true)"
+[[ -z "${mode:-}" ]] && exit 0
+
+pair="${MODES[$mode]:-}"
+[[ -n "$pair" ]] || { notify "Invalid mode" "$mode"; exit 1; }
+
+if write_thresholds "$pair"; then
+  current="$(cat "$SYSFILE" 2>/dev/null || echo "$pair")"
+  notify "Mode set: $mode" "Thresholds: $current"
+  exit 0
+fi
+
+notify "Need permission to write thresholds" \
+"Failed to write without password.
+Fix permanently (pick ONE):
+• Udev rule → relax permissions
+• Sudoers → allow passwordless tee
+
+Example sudoers (via visudo):
+  $(id -un) ALL=(ALL) NOPASSWD: /usr/bin/tee $SYSFILE
+"
+exit 1
+
