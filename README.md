@@ -1,7 +1,7 @@
 # Kittybox ( ͡° ᴥ ͡°)﻿
 i was bored and kinda drunk so i made this in a day enjoy while it last or until i got bored and reset my laptop again ~~or when i switch to mac~~
 - terminal : foot
-- browser : helium browser
+- browser : helium browser ([Gruvbox Slate Theme](https://chromewebstore.google.com/detail/gruvbox-slate/giokfhncgfjkoamdbhfhfhgpikaioccc))
 - game : the farmer was replaced
 - code editor : vscodium (material gruvbox theme)
 - colorscheme : gruvbox
