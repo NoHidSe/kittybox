@@ -14,3 +14,5 @@ btw this dotfiles focus on a laptop setup
 ![alt text](screenshots/2025-10-26-031332_hyprshot.png)
 ![alt text](screenshots/2025-10-26-031322_hyprshot.png)
 ![alt text](screenshots/2025-10-26-031307_hyprshot.png)
+# IT BROKE
+for some reason (that is beyond my knowledge) neovim broke ( ͡° ʖ̯ ͡°) so yeah dont copy that shit lmfao
